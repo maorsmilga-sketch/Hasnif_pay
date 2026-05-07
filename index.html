@@ -187,7 +187,21 @@
       color: #d1d5db;
       font-size: 1.05rem;
       line-height: 1.65;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #34d399;
+      letter-spacing: 0.04em;
+      background: rgba(5, 150, 105, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      user-select: all;
+      -webkit-user-select: all;
     }
 
     .modal-btn {
@@ -195,13 +209,17 @@
       padding: 0.9rem 1.25rem;
       border: none;
       border-radius: 12px;
-      background: linear-gradient(135deg, #4f46e5, #6d28d9);
+      background: linear-gradient(135deg, #059669, #10b981);
       color: #ffffff;
       font-family: inherit;
       font-size: 1.1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: filter 0.12s ease, transform 0.12s ease;
+      transition: filter 0.12s ease, transform 0.12s ease, background 0.18s ease;
+    }
+
+    .modal-btn + .modal-btn {
+      margin-top: 0.6rem;
     }
 
     .modal-btn:hover {
@@ -211,6 +229,25 @@
 
     .modal-btn:active {
       transform: translateY(0);
+    }
+
+    .modal-btn.copied {
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    }
+
+    .modal-btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #d1d5db;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      filter: none;
+    }
+
+    [hidden] {
+      display: none !important;
     }
   </style>
 </head>
@@ -249,7 +286,9 @@
       <button id="info-close-x" class="modal-close" type="button" aria-label="סגור">&times;</button>
       <h2 id="info-modal-title" class="modal-title">כותרת</h2>
       <p id="info-modal-text" class="modal-text">טקסט</p>
-      <button id="info-ok-btn" class="modal-btn" type="button">סגור</button>
+      <div id="info-modal-number" class="modal-number" dir="ltr" hidden>000-000-0000</div>
+      <button id="info-primary-btn" class="modal-btn" type="button" hidden>פעולה</button>
+      <button id="info-ok-btn" class="modal-btn modal-btn-secondary" type="button">סגור</button>
     </div>
   </div>
 
@@ -257,25 +296,48 @@
     // ===== הגדרות - שנה כאן בלבד =====
     const CONFIG = {
       payboxGroupUrl:  "https://links.payboxapp.com/VGgSI54AzVb",  // קישור קבוצת PayBox
-      bitPhoneNumber:  "0559877777",                                // מספר הטלפון אליו יועבר התשלום ב-Bit
+      bitPhoneNumber:  "0559877777",                                // מספר הטלפון להעברה ב-Bit
+      bitOpenAppUrl:   "https://www.bitpay.co.il/app/",             // URL לפתיחת אפליקציית Bit
       cashcashMessage: "השירות עדיין לא נתמך, מבטיחים לתמוך בהמשך :) בנתיים תוכל להשתמש באופציות האחרות.",
     };
     // ===================================
 
     document.getElementById("btn-paybox").href = CONFIG.payboxGroupUrl;
-    document.getElementById("btn-bit").href =
-      "https://www.bitpay.co.il/app/me/" + CONFIG.bitPhoneNumber;
 
     // ----- מודאל כללי -----
-    const infoModal     = document.getElementById("info-modal");
-    const infoTitleEl   = document.getElementById("info-modal-title");
-    const infoTextEl    = document.getElementById("info-modal-text");
-    const infoCloseX    = document.getElementById("info-close-x");
-    const infoOkBtn     = document.getElementById("info-ok-btn");
+    const infoModal      = document.getElementById("info-modal");
+    const infoTitleEl    = document.getElementById("info-modal-title");
+    const infoTextEl     = document.getElementById("info-modal-text");
+    const infoNumberEl   = document.getElementById("info-modal-number");
+    const infoPrimaryBtn = document.getElementById("info-primary-btn");
+    const infoOkBtn      = document.getElementById("info-ok-btn");
+    const infoCloseX     = document.getElementById("info-close-x");
 
-    function openInfoModal(title, text) {
-      infoTitleEl.textContent = title;
-      infoTextEl.textContent  = text;
+    let primaryHandler = null;
+
+    function openInfoModal(opts) {
+      infoTitleEl.textContent = opts.title || "";
+      infoTextEl.textContent  = opts.text  || "";
+
+      if (opts.number) {
+        infoNumberEl.textContent = opts.number;
+        infoNumberEl.hidden = false;
+      } else {
+        infoNumberEl.hidden = true;
+      }
+
+      infoPrimaryBtn.classList.remove("copied");
+      if (opts.primaryLabel && typeof opts.onPrimary === "function") {
+        infoPrimaryBtn.textContent = opts.primaryLabel;
+        infoPrimaryBtn.hidden = false;
+        primaryHandler = opts.onPrimary;
+      } else {
+        infoPrimaryBtn.hidden = true;
+        primaryHandler = null;
+      }
+
+      infoOkBtn.textContent = opts.closeLabel || "סגור";
+
       infoModal.classList.add("is-open");
       infoModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
@@ -285,10 +347,14 @@
       infoModal.classList.remove("is-open");
       infoModal.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
+      primaryHandler = null;
     }
 
-    infoCloseX.addEventListener("click", closeInfoModal);
+    infoPrimaryBtn.addEventListener("click", function () {
+      if (typeof primaryHandler === "function") primaryHandler();
+    });
     infoOkBtn.addEventListener("click", closeInfoModal);
+    infoCloseX.addEventListener("click", closeInfoModal);
     infoModal.addEventListener("click", function (e) {
       if (e.target === infoModal) closeInfoModal();
     });
@@ -298,13 +364,71 @@
       }
     });
 
+    function formatPhone(raw) {
+      const digits = String(raw || "").replace(/\D/g, "");
+      if (digits.length === 10) {
+        return digits.slice(0, 3) + "-" + digits.slice(3, 6) + "-" + digits.slice(6);
+      }
+      return digits;
+    }
+
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        const tmp = document.createElement("textarea");
+        tmp.value = text;
+        tmp.style.position = "fixed";
+        tmp.style.opacity = "0";
+        document.body.appendChild(tmp);
+        tmp.select();
+        try { document.execCommand("copy"); } catch (_) {}
+        document.body.removeChild(tmp);
+      }
+    }
+
+    // ----- כפתור Bit -----
+    const bitBtn = document.getElementById("btn-bit");
+    bitBtn.removeAttribute("target");
+    bitBtn.href = "#";
+    bitBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      openBitModal();
+    });
+
+    function openBitModal() {
+      const rawDigits = String(CONFIG.bitPhoneNumber || "").replace(/\D/g, "");
+      let copied = false;
+
+      openInfoModal({
+        title: "תשלום ב-Bit",
+        text: "פתחו את אפליקציית Bit ושלחו למספר:",
+        number: formatPhone(CONFIG.bitPhoneNumber),
+        primaryLabel: "העתק מספר",
+        onPrimary: async function () {
+          if (!copied) {
+            await copyToClipboard(rawDigits);
+            copied = true;
+            infoPrimaryBtn.textContent = "פתח Bit";
+            infoPrimaryBtn.classList.add("copied");
+          } else {
+            window.open(CONFIG.bitOpenAppUrl, "_blank", "noopener");
+            closeInfoModal();
+          }
+        },
+      });
+    }
+
     // ----- כפתור CashCash -----
     const cashBtn = document.getElementById("btn-cashcash");
     cashBtn.removeAttribute("target");
     cashBtn.href = "#";
     cashBtn.addEventListener("click", function (e) {
       e.preventDefault();
-      openInfoModal("CashCash", CONFIG.cashcashMessage);
+      openInfoModal({
+        title: "CashCash",
+        text:  CONFIG.cashcashMessage,
+      });
     });
   </script>
 
