@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>הסניף הדיגיטלי</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0f1117;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      padding: 2rem 1.25rem;
+      gap: 2.5rem;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #9ca3af;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      border-radius: 14px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #ffffff;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      filter: brightness(0.95);
+    }
+
+    .btn-paybox {
+      background: linear-gradient(135deg, #4f46e5, #6d28d9);
+    }
+
+    .btn-bit {
+      background: linear-gradient(135deg, #059669, #10b981);
+    }
+
+    .btn-cashcash {
+      background: linear-gradient(135deg, #dc2626, #f97316);
+    }
+
+    .btn svg {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    footer {
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>הסניף הדיגיטלי</h1>
+    <p>בחר אמצעי תשלום</p>
+  </header>
+
+  <div class="buttons">
+    <a id="btn-paybox" href="#" class="btn btn-paybox" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="3"/>
+        <path d="M2 10h20"/>
+      </svg>
+      PayBox
+    </a>
+
+    <a id="btn-bit" href="#" class="btn btn-bit" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+      Bit
+    </a>
+
+    <a id="btn-cashcash" href="#" class="btn btn-cashcash" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="8"/>
+        <path d="M12 8v8M9 10h4.5a1.5 1.5 0 0 1 0 3H9"/>
+      </svg>
+      CashCash
+    </a>
+  </div>
+
+  <footer>הסניף הדיגיטלי &copy; 2026</footer>
+
+  <script>
+    // ===== הגדרות - שנה כאן בלבד =====
+    const CONFIG = {
+      payboxGroupUrl: "https://payboxapp.page.link/REPLACE_ME",  // קישור קבוצת PayBox
+      bitPhoneNumber: "05XXXXXXXX",                               // מספר טלפון לביט
+      cashcashUrl:    "https://www.cashcash.co.il/REPLACE_ME",   // קישור CashCash
+    };
+    // ===================================
+
+    document.getElementById("btn-paybox").href = CONFIG.payboxGroupUrl;
+    document.getElementById("btn-bit").href =
+      "https://www.bitpay.co.il/app/charge?phone=" + CONFIG.bitPhoneNumber;
+    document.getElementById("btn-cashcash").href = CONFIG.cashcashUrl;
+  </script>
+
+</body>
+</html>
